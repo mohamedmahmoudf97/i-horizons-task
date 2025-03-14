@@ -1,84 +1,61 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-# Pokemon Application
+# Pokemon Explorer
 
-This application allows users to browse a list of Pokemon, view detailed information about each Pokemon, and mark their favorites. The application is built using Next.js, TypeScript, Redux Toolkit, and RTK Query.
+A Next.js application built as part of a technical assessment that allows users to explore Pokemon using the PokeAPI.
 
-## Features
+## Live Demo
+[View Demo](https://i-horizons-task.vercel.app/)
 
-- **Pokemon List**: View a paginated list of Pokemon with their images and basic information
-- **Pagination**: Navigate through the complete Pokemon list with next and previous buttons
-- **Pokemon Details**: Click on a Pokemon to view detailed information including stats, abilities, and types
-- **Favorites**: Mark Pokemon as favorites for quick access
-- **Recently Viewed**: Keep track of recently viewed Pokemon
-- **Persistent Storage**: Favorites and recently viewed Pokemon are stored in localStorage
+## Quick Start
 
-## Tech Stack
-
-- **Next.js**: Framework for server-side rendering and routing
-- **TypeScript**: For type safety and better developer experience
-- **Redux Toolkit**: For state management
-- **RTK Query**: For data fetching and caching
-- **Jest & React Testing Library**: For unit testing
-
-## Getting Started
-
-First, install the dependencies:
-
+1. **Install Dependencies**
 ```bash
 npm install
-# or
-yarn install
-# or
-pnpm install
 ```
 
-Then, run the development server:
-
+2. **Set Environment Variable**
+Create `.env.local`:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
-
-## Environment Variables
-
-The application uses the following environment variables:
-
-- `NEXT_PUBLIC_POKEMON_API_URL`: The base URL for the Pokemon API (defaults to 'https://pokeapi.co/api/v2')
-
-Create a `.env.local` file in the root directory to set these variables:
-
-```
 NEXT_PUBLIC_POKEMON_API_URL=https://pokeapi.co/api/v2
 ```
 
-## Configuration
-
-The application uses a `next.config.js` file to configure Next.js. This includes setting up image domains for the Pokemon API:
-
-```javascript
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-  images: {
-    domains: ['raw.githubusercontent.com'],
-  },
-};
-
-module.exports = nextConfig;
+3. **Run Development Server**
+```bash
+npm run dev
 ```
+Open [http://localhost:3000](http://localhost:3000)
 
-This configuration is necessary to allow Next.js to load and optimize images from the Pokemon API.
+## Features
+
+- 🔍 Browse Pokemon with pagination
+- 💾 Favorite Pokemon functionality with local storage
+- 🌓 Dark/Light theme support
+- 📱 Responsive design
+- 🧪 Test coverage
+
+## Tech Stack
+
+- Next.js 14
+- TypeScript
+- Redux Toolkit & RTK Query
+- Tailwind CSS
+- Jest & React Testing Library
 
 ## Testing
 
+```bash
+npm test
+```# Pokemon Explorer
+
+## Project StructureA Next.js application built as part of a technical assessment that allows users to explore Pokemon using the PokeAPI.
+```
+src/## Live Demo
+├── app/          # Next.js app components
+├── features/     # Feature modules
+├── store/        # Redux configuration
+└── test/         # Test setup
+```**Install Dependencies**
 To run the tests:
 
 ```bash
