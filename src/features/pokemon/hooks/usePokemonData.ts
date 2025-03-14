@@ -75,7 +75,7 @@ export const usePokemonData = (searchTerm: string, filters: FilterOptions) => {
       try {
         const fetchPromises = detailsToFetch.map(async (id) => {
           try {
-            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_POKEMON_API_URL}/pokemon/${id}`);
             if (!response.ok) throw new Error(`Failed to fetch Pokemon ${id}`);
             const details: PokemonDetail = await response.json();
             setPokemonDetails(prevDetails => ({ ...prevDetails, [id]: details }));

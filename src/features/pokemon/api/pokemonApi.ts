@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { PokemonDetail, PokemonListResponse } from '../types';
 
 // Get the base URL from environment variables or use the default
-const BASE_URL = process.env.NEXT_PUBLIC_POKEMON_API_URL || 'https://pokeapi.co/api/v2';
+const BASE_URL = process.env.NEXT_PUBLIC_POKEMON_API_URL;
 const LIMIT = 20; // Number of Pokemon per page
 
 export interface PaginationParams {
