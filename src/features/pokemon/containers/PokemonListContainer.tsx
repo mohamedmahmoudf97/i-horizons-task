@@ -31,8 +31,8 @@ const PokemonListContainer: React.FC = () => {
     maxWeight: undefined,
     abilities: [],
   });
-  // Update the ref type to be non-nullable to match VirtualizedPokemonGrid's expectation
-  const listRef = useRef<List>({} as List);
+  // Use null but handle the null case in the methods that use the ref
+  const listRef = useRef<List>(null);
   
   // Use the custom hook to manage Pokemon data
   const {

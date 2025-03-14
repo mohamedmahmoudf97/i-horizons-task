@@ -10,7 +10,7 @@ interface VirtualizedPokemonGridProps {
   onSelectPokemon: (id: number) => void;
   onToggleFavorite: (id: number, event: React.MouseEvent) => void;
   onScroll: (params: { clientHeight: number, scrollHeight: number, scrollTop: number }) => void;
-  listRef: React.RefObject<List>;
+  listRef: React.RefObject<List | null>;
 }
 
 /**

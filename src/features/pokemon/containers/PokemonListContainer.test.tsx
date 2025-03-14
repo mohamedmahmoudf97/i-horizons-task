@@ -8,19 +8,29 @@ import * as usePokemonDataModule from '../hooks/usePokemonData';
 
 // Mock react-virtualized
 jest.mock('react-virtualized', () => {
-  const List = ({ rowRenderer }: { rowRenderer: (params: { index: number; key: string; style: React.CSSProperties }) => React.ReactNode }) => {
-    // Render a few rows to test the component
-    return (
-      <div data-testid="virtualized-list">
-        {rowRenderer({ index: 0, key: 'row-0', style: {} })}
-      </div>
-    );
-  };
+  interface MockListProps {
+    rowRenderer: ({ index, key, style }: { index: number; key: string; style: React.CSSProperties }) => React.ReactNode;
+  }
+
+  // Create a mock List component with scrollToRow method
+  class MockList extends React.Component<MockListProps> {
+    scrollToRow = jest.fn();
+    
+    render() {
+      const { rowRenderer } = this.props;
+      // Render a few rows to test the component
+      return (
+        <div data-testid="virtualized-list">
+          {rowRenderer({ index: 0, key: 'row-0', style: {} })}
+        </div>
+      );
+    }
+  }
   
-  const AutoSizer = ({ children }: { children: (size: { width: number; height: number }) => React.ReactNode }) => children({ width: 1000, height: 600 });
+  const AutoSizer = ({ children }: { children: (props: { width: number; height: number }) => React.ReactNode }) => children({ width: 1000, height: 600 });
   
   return {
-    List,
+    List: MockList,
     AutoSizer,
   };
 });
