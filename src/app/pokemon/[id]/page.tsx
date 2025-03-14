@@ -1,16 +1,20 @@
 import { Suspense } from 'react';
+import { Metadata } from 'next';
 import PokemonDetailContainer from '../../../features/pokemon/containers/PokemonDetailContainer';
 
-interface PokemonDetailPageProps {
-  params: {
-    id: string;
+type Params = Promise<{ id: string }>;
+
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { id } = await params;
+  return {
+    title: `Pokemon #${id}`,
+    description: `Details for Pokemon #${id}`,
   };
 }
 
-export default async function PokemonDetailPage({ params }: PokemonDetailPageProps) {
-  // Ensure params is properly awaited
-  const resolvedParams = await Promise.resolve(params);
-  const pokemonId = parseInt(resolvedParams.id);
+export default async function Page({ params }: { params: Params }) {
+  const { id } = await params;
+  const pokemonId = parseInt(id);
 
   return (
     <div>

@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useGetPokemonListQuery } from '../api/pokemonApi';
 import { filterPokemonByName, filterPokemonByAttributes, extractAbilities } from '../utils/filterUtils';
-import { Pokemon, PokemonDetail } from '../types';
-import { FilterOptions } from '../components/PokemonSearchFilter';
+import { FilterOptions, Pokemon, PokemonDetail } from '../types';
 
 const ITEMS_PER_PAGE = 20;
 

@@ -1,6 +1,5 @@
-import { filterPokemonByName, filterPokemonByAttributes, extractAbilities } from './filterUtils';
-import { Pokemon, PokemonDetail } from '../types';
-import { FilterOptions } from '../components/PokemonSearchFilter';
+import { filterPokemonByName, filterPokemonByAttributes, extractAbilities, hasActiveFilters } from './filterUtils';
+import { FilterOptions, Pokemon, PokemonDetail } from '../types';
 
 describe('filterUtils', () => {
   // Mock data for testing
@@ -70,6 +69,52 @@ describe('filterUtils', () => {
       types: [{ slot: 1, type: { name: 'fire', url: '' } }],
     },
   };
+
+  describe('hasActiveFilters', () => {
+    it('returns false when no filters are active', () => {
+      const emptyFilters: FilterOptions = {
+        abilities: [],
+        minHeight: undefined,
+        maxHeight: undefined,
+        minWeight: undefined,
+        maxWeight: undefined
+      };
+      expect(hasActiveFilters(emptyFilters)).toBe(false);
+    });
+
+    it('returns true when abilities filter is active', () => {
+      const filters: FilterOptions = {
+        abilities: ['overgrow'],
+        minHeight: undefined,
+        maxHeight: undefined,
+        minWeight: undefined,
+        maxWeight: undefined
+      };
+      expect(hasActiveFilters(filters)).toBe(true);
+    });
+
+    it('returns true when height filter is active', () => {
+      const filters: FilterOptions = {
+        abilities: [],
+        minHeight: 10,
+        maxHeight: undefined,
+        minWeight: undefined,
+        maxWeight: undefined
+      };
+      expect(hasActiveFilters(filters)).toBe(true);
+    });
+
+    it('returns true when weight filter is active', () => {
+      const filters: FilterOptions = {
+        abilities: [],
+        minHeight: undefined,
+        maxHeight: undefined,
+        minWeight: undefined,
+        maxWeight: 100
+      };
+      expect(hasActiveFilters(filters)).toBe(true);
+    });
+  });
 
   describe('filterPokemonByName', () => {
     it('returns all Pokemon when search term is empty', () => {
@@ -207,7 +252,7 @@ describe('filterUtils', () => {
 
     it('returns empty array when no Pokemon details are provided', () => {
       const abilities = extractAbilities({});
-      expect(abilities).toEqual([]);
+      expect(abilities).toHaveLength(0);
     });
   });
 });

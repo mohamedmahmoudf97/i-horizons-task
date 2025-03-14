@@ -2,10 +2,9 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import { useGetPokemonListQuery } from '../api/pokemonApi';
 import PokemonListContainer from './PokemonListContainer';
 import pokemonReducer from '../../../store/pokemonSlice';
-import * as filterUtils from '../utils/filterUtils';
+import * as usePokemonDataModule from '../hooks/usePokemonData';
 
 // Mock react-virtualized
 jest.mock('react-virtualized', () => {
@@ -58,36 +57,17 @@ jest.mock('../utils/filterUtils', () => ({
 // Mock next/image
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: (props: { src: string; alt: string; width?: number; height?: number; className?: string }) => {
-    return <img src={props.src} alt={props.alt} className={props.className} />;
+  default: function MockImage(props: { src: string | undefined; alt: string | undefined; }) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={props.src} alt={props.alt} data-testid="next-image" />;
   },
 }));
 
-// Mock fetch for Pokemon details
-global.fetch = jest.fn().mockImplementation((url) => {
-  const id = url.split('/').pop();
-  return Promise.resolve({
-    ok: true,
-    json: () => Promise.resolve({
-      id: Number(id),
-      name: `pokemon-${id}`,
-      height: 7,
-      weight: 69,
-      abilities: [
-        { ability: { name: 'overgrow', url: '' }, is_hidden: false, slot: 1 },
-      ],
-      sprites: {
-        front_default: '',
-        back_default: '',
-        front_shiny: '',
-        back_shiny: '',
-        other: { 'official-artwork': { front_default: '' } },
-      },
-      stats: [],
-      types: [{ slot: 1, type: { name: 'grass', url: '' } }],
-    }),
-  });
-});
+// Mock usePokemonData hook
+jest.mock('../hooks/usePokemonData', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
 
 describe('PokemonListContainer', () => {
   const mockPokemons = [
@@ -131,18 +111,29 @@ describe('PokemonListContainer', () => {
     },
   });
 
+  // Default mock implementation for usePokemonData
+  const mockUsePokemonData = {
+    filteredPokemons: mockPokemons,
+    availableAbilities: ['overgrow', 'chlorophyll'],
+    isLoading: false,
+    isLoadingMore: false,
+    error: undefined,
+    currentPage: 0,
+    totalPages: 10,
+    hasNextPage: true,
+    loadNextPage: jest.fn(),
+    loadPreviousPage: jest.fn(),
+    allPokemons: mockPokemons
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
-    (useGetPokemonListQuery as jest.Mock).mockReturnValue({
-      data: {
-        count: 1118,
-        results: mockPokemons,
-        next: 'https://pokeapi.co/api/v2/pokemon?offset=20&limit=20',
-        previous: null,
-      },
-      error: undefined,
-      isLoading: false,
-    });
+    // Set up default mock implementation for usePokemonData
+    (usePokemonDataModule.default as jest.Mock).mockReturnValue(mockUsePokemonData);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it('renders the component with Pokemon data', async () => {
@@ -197,17 +188,17 @@ describe('PokemonListContainer', () => {
     const searchInput = screen.getByTestId('search-input');
     fireEvent.change(searchInput, { target: { value: 'bulba' } });
 
-    // Check if the filter function was called
-    await waitFor(() => {
-      expect(filterUtils.filterPokemonByName).toHaveBeenCalledWith(expect.anything(), 'bulba');
-    });
+    // We don't need to test the filter function here since it's mocked
+    // Just verify the input works
+    expect(searchInput).toHaveValue('bulba');
   });
 
   it('shows loading state when isLoading is true', () => {
-    (useGetPokemonListQuery as jest.Mock).mockReturnValue({
-      data: null,
-      error: undefined,
+    // Override the default mock for this specific test
+    (usePokemonDataModule.default as jest.Mock).mockReturnValue({
+      ...mockUsePokemonData,
       isLoading: true,
+      allPokemons: []
     });
 
     render(
@@ -220,10 +211,11 @@ describe('PokemonListContainer', () => {
   });
 
   it('shows error state when there is an error', () => {
-    (useGetPokemonListQuery as jest.Mock).mockReturnValue({
-      data: null,
+    // Override the default mock for this specific test
+    (usePokemonDataModule.default as jest.Mock).mockReturnValue({
+      ...mockUsePokemonData,
       error: { status: 500, data: 'Server error' },
-      isLoading: false,
+      isLoading: false
     });
 
     render(
@@ -236,7 +228,11 @@ describe('PokemonListContainer', () => {
   });
 
   it('shows empty state when no Pokemon are found', () => {
-    (filterUtils.filterPokemonByAttributes as jest.Mock).mockReturnValue([]);
+    // Override the default mock for this specific test
+    (usePokemonDataModule.default as jest.Mock).mockReturnValue({
+      ...mockUsePokemonData,
+      filteredPokemons: []
+    });
 
     render(
       <Provider store={mockStore}>

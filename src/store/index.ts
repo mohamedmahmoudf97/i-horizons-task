@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { pokemonApi } from '../features/pokemon/api/pokemonApi';
 import pokemonReducer from './pokemonSlice';
+import { localStorageMiddleware } from './middleware/localStorage';
 
 export const store = configureStore({
   reducer: {
@@ -9,7 +10,7 @@ export const store = configureStore({
     pokemon: pokemonReducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(pokemonApi.middleware),
+    getDefaultMiddleware().concat(pokemonApi.middleware, localStorageMiddleware),
 });
 
 // Optional, but required for refetchOnFocus/refetchOnReconnect behaviors

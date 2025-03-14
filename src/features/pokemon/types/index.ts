@@ -51,3 +51,11 @@ export interface PokemonListResponse {
   previous: string | null;
   results: Pokemon[];
 }
+
+export interface FilterOptions {
+  minHeight?: number;
+  maxHeight?: number;
+  minWeight?: number;
+  maxWeight?: number;
+  abilities: string[];
+}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { List, AutoSizer, ListRowProps } from 'react-virtualized';
 import { Pokemon } from '../types';
 import PokemonGridCard from './PokemonGridCard';
@@ -10,7 +10,7 @@ interface VirtualizedPokemonGridProps {
   onSelectPokemon: (id: number) => void;
   onToggleFavorite: (id: number, event: React.MouseEvent) => void;
   onScroll: (params: { clientHeight: number, scrollHeight: number, scrollTop: number }) => void;
-  listRef: React.RefObject<List | null>;
+  listRef: React.RefObject<List>;
 }
 
 /**
@@ -30,28 +30,29 @@ const VirtualizedPokemonGrid: React.FC<VirtualizedPokemonGridProps> = ({
   const [cardsPerRow, setCardsPerRow] = useState(defaultCardsPerRow);
   const [rowHeight, setRowHeight] = useState(220);
 
+  // Memoize the resize handler to prevent unnecessary function recreation
+  const handleResize = useCallback(() => {
+    const width = window.innerWidth;
+    if (width < 640) { // sm
+      setCardsPerRow(1);
+      setRowHeight(200);
+    } else if (width < 768) { // md
+      setCardsPerRow(2);
+      setRowHeight(210);
+    } else if (width < 1024) { // lg
+      setCardsPerRow(3);
+      setRowHeight(220);
+    } else if (width < 1280) { // xl
+      setCardsPerRow(4);
+      setRowHeight(220);
+    } else { // 2xl
+      setCardsPerRow(5);
+      setRowHeight(220);
+    }
+  }, []);
+
   // Update cards per row based on window width
   useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      if (width < 640) { // sm
-        setCardsPerRow(1);
-        setRowHeight(200);
-      } else if (width < 768) { // md
-        setCardsPerRow(2);
-        setRowHeight(210);
-      } else if (width < 1024) { // lg
-        setCardsPerRow(3);
-        setRowHeight(220);
-      } else if (width < 1280) { // xl
-        setCardsPerRow(4);
-        setRowHeight(220);
-      } else { // 2xl
-        setCardsPerRow(5);
-        setRowHeight(220);
-      }
-    };
-
     // Set initial value
     handleResize();
 
@@ -60,13 +61,16 @@ const VirtualizedPokemonGrid: React.FC<VirtualizedPokemonGridProps> = ({
     
     // Clean up
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [handleResize]);
 
-  // Calculate row count based on items per row
-  const rowCount = Math.ceil(pokemons.length / cardsPerRow);
+  // Memoize row count calculation to prevent recalculation on every render
+  const rowCount = useMemo(() => 
+    Math.ceil(pokemons.length / cardsPerRow), 
+    [pokemons.length, cardsPerRow]
+  );
 
-  // Row renderer for virtualized list
-  const rowRenderer = ({ index, key, style }: ListRowProps) => {
+  // Memoize the row renderer function
+  const rowRenderer = useCallback(({ index, key, style }: ListRowProps) => {
     const startIdx = index * cardsPerRow;
     const pokemonsInRow = pokemons.slice(startIdx, startIdx + cardsPerRow);
     
@@ -92,14 +96,14 @@ const VirtualizedPokemonGrid: React.FC<VirtualizedPokemonGridProps> = ({
         ))}
       </div>
     );
-  };
+  }, [pokemons, cardsPerRow, favorites, onSelectPokemon, onToggleFavorite]);
 
   return (
     <div className="h-[65vh] w-full" data-testid="pokemon-list">
       <AutoSizer>
         {({ height, width }) => (
           <List
-            ref={listRef as React.RefObject<List>}
+            ref={listRef}
             height={height}
             width={width}
             rowCount={rowCount}

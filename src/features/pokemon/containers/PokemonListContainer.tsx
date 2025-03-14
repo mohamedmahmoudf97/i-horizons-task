@@ -4,13 +4,14 @@ import React, { useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleFavorite } from '../../../store/pokemonSlice';
-import PokemonSearchFilter, { FilterOptions } from '../components/PokemonSearchFilter';
+import PokemonSearchFilter from '../components/PokemonSearchFilter';
 import { RootState } from '../../../store';
 import { List } from 'react-virtualized';
 import usePokemonData from '../hooks/usePokemonData';
 import VirtualizedPokemonGrid from '../components/VirtualizedPokemonGrid';
 import PaginationControls from '../components/PaginationControls';
 import { FullPageLoading, ErrorMessage, EmptyListMessage } from '../components/LoadingErrorStates';
+import { FilterOptions } from '../types';
 
 const CARDS_PER_ROW = 5;
 
@@ -30,7 +31,8 @@ const PokemonListContainer: React.FC = () => {
     maxWeight: undefined,
     abilities: [],
   });
-  const listRef = useRef<List>(null);
+  // Update the ref type to be non-nullable to match VirtualizedPokemonGrid's expectation
+  const listRef = useRef<List>({} as List);
   
   // Use the custom hook to manage Pokemon data
   const {
@@ -62,7 +64,7 @@ const PokemonListContainer: React.FC = () => {
     setSearchTerm(term);
     // Reset list scroll position when search changes
     if (listRef.current) {
-      listRef.current.scrollToPosition(0);
+      listRef.current.scrollToRow(0);
     }
   }, []);
 
@@ -70,7 +72,7 @@ const PokemonListContainer: React.FC = () => {
     setFilters(newFilters);
     // Reset list scroll position when filters change
     if (listRef.current) {
-      listRef.current.scrollToPosition(0);
+      listRef.current.scrollToRow(0);
     }
   }, []);
 
